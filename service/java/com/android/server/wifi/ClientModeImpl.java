@@ -255,7 +255,7 @@ public class ClientModeImpl extends StateMachine {
     private int mLastSubId;
     private String mLastSimBasedConnectionCarrierName;
 
-    private boolean mIpReachabilityDisconnectEnabled = true;
+    private boolean mIpReachabilityDisconnectEnabled = false;
 
     private void processRssiThreshold(byte curRssi, int reason,
             WifiNative.WifiRssiEventHandler rssiHandler) {

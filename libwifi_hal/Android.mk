@@ -66,7 +66,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libwifi-hal-common
 LOCAL_VENDOR_MODULE := true
 LOCAL_CFLAGS := $(wifi_hal_cflags)
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/include system/core/include
 LOCAL_SHARED_LIBRARIES := libbase
 LOCAL_HEADER_LIBRARIES := libcutils_headers
 LOCAL_SRC_FILES := wifi_hal_common.cpp
@@ -90,6 +90,8 @@ VENDOR_LOCAL_SHARED_LIBRARIES :=
 ifeq ($(BOARD_WLAN_DEVICE), bcmdhd)
   LIB_WIFI_HAL := libwifi-hal-bcm
   VENDOR_LOCAL_SHARED_LIBRARIES := libcrypto
+else ifeq ($(BOARD_WLAN_DEVICE), ssv)
+  LIB_WIFI_HAL := libwifi-hal-ssv
 else ifeq ($(BOARD_WLAN_DEVICE), qcwcn)
   LIB_WIFI_HAL := libwifi-hal-qcom
   VENDOR_LOCAL_SHARED_LIBRARIES := libcld80211
@@ -124,6 +126,7 @@ LOCAL_SHARED_LIBRARIES := \
     liblog \
     libnl \
     libutils \
+    librkwifi-ctrl \
     $(VENDOR_LOCAL_SHARED_LIBRARIES)
 LOCAL_SRC_FILES := \
     driver_tool.cpp \

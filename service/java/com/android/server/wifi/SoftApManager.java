@@ -24,6 +24,7 @@ import static com.android.server.wifi.util.ApConfigUtil.ERROR_UNSUPPORTED_CONFIG
 import static com.android.server.wifi.util.ApConfigUtil.SUCCESS;
 
 import android.annotation.NonNull;
+import android.content.Context;
 import android.content.Intent;
 import android.net.MacAddress;
 import android.net.wifi.ScanResult;
@@ -37,6 +38,7 @@ import android.net.wifi.nl80211.NativeWifiClient;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.PowerManager;
 import android.os.SystemClock;
 import android.os.UserHandle;
 import android.text.TextUtils;
@@ -110,6 +112,7 @@ public class SoftApManager implements ActiveModeManager {
 
     private List<WifiClient> mConnectedClients = new ArrayList<>();
     private boolean mTimeoutEnabled = false;
+    private PowerManager.WakeLock mSoftApWakeLock;
 
     private final SarManager mSarManager;
 
@@ -204,6 +207,8 @@ public class SoftApManager implements ActiveModeManager {
         }
         mDefaultShutDownTimeoutMills = mContext.getResources().getInteger(
                 R.integer.config_wifiFrameworkSoftApShutDownTimeoutMilliseconds);
+	PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+	mSoftApWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SoftAp");
     }
 
     /**
@@ -434,6 +439,10 @@ public class SoftApManager implements ActiveModeManager {
 
         mWifiDiagnostics.startLogging(mApInterfaceName);
         mStartTimestamp = FORMATTER.format(new Date(System.currentTimeMillis()));
+	if (!mSoftApWakeLock.isHeld()) {
+		Log.d(TAG,"---- mSoftApWakeLock.acquire ----");
+		mSoftApWakeLock.acquire();
+	}
         Log.d(TAG, "Soft AP is started ");
 
         return SUCCESS;
@@ -457,6 +466,10 @@ public class SoftApManager implements ActiveModeManager {
         disconnectAllClients();
         mWifiDiagnostics.stopLogging(mApInterfaceName);
         mWifiNative.teardownInterface(mApInterfaceName);
+	if (mSoftApWakeLock.isHeld()) {
+		Log.d(TAG,"---- mSoftApWakeLock.release ----");
+		mSoftApWakeLock.release();
+	}
         Log.d(TAG, "Soft AP is stopped");
     }
 

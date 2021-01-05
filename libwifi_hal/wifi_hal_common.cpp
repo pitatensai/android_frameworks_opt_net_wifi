@@ -387,9 +387,8 @@ int wifi_load_driver() {
 }
 
 int wifi_unload_driver() {
-#if 1
-  bool config = property_get_bool("ro.wifi.sleep.power.down", false);
-  if (!is_wifi_driver_loaded() || !config) {
+#if 0
+  if (!is_wifi_driver_loaded()) {
     property_set(DRIVER_PROP_NAME, "unloaded");
     return 0;
   }
